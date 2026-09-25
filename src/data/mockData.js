@@ -27,7 +27,7 @@ export const MARKETS = [
     image: "/farmers_market_bazaar.jpg",
     pickup_slots: ["08:00 AM - 10:00 AM", "10:00 AM - 01:00 PM"],
     description: "Karachi's flagship coastal farmers market featuring certified organic vegetables, cold-pressed seed oils, fresh pastured eggs, and wild Sidr honey directly from Malir smallholders.",
-    facilities: ["ðŸ…¿ï¸ Dedicated Visitor Parking", "ðŸŒ¿ 100% Organic Certified Stalls", "â™¿ Wheelchair Accessible", "ðŸ’³ Mobile / Card Contactless Pay", "ðŸ¥¤ Cold-Pressed Juice Counter"],
+    facilities: ["🅿️ Dedicated Visitor Parking", "🌿 100% Organic Certified Stalls", "♿ Wheelchair Accessible", "💳 Mobile / Card Contactless Pay", "🥤 Cold-Pressed Juice Counter"],
     featured_produce: ["Heirloom Tomatoes", "Native Palak", "Raw Sidr Honey", "Grass-Fed Butter"],
     map_provider: "OpenStreetMap / Google Maps API",
     stall_layout_map: [
@@ -56,7 +56,7 @@ export const MARKETS = [
     image: "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80",
     pickup_slots: ["04:00 PM - 06:30 PM", "06:30 PM - 09:00 PM"],
     description: "Vibrant evening market nestled in Gulshan-e-Iqbal. Perfect for midweek fresh harvest restocking, hydroponic greens, artisan sourdough breads, and pure Desi cow ghee.",
-    facilities: ["ðŸ…¿ï¸ Street & Plaza Parking", "ðŸž On-Site Artisan Bakery", "ðŸ’³ Mobile Wallet Payment", "ðŸŒ¿ Pesticide-Free Produce"],
+    facilities: ["🅿️ Street & Plaza Parking", "🍞 On-Site Artisan Bakery", "💳 Mobile Wallet Payment", "🌿 Pesticide-Free Produce"],
     featured_produce: ["Hydroponic Bell Peppers", "Wild Berry Honey", "Pure A2 Ghee", "Artisan Bread"],
     map_provider: "Google Maps API",
     stall_layout_map: [
@@ -84,7 +84,7 @@ export const MARKETS = [
     image: "https://images.unsplash.com/photo-1578916171728-46686eac8d58?auto=format&fit=crop&w=800&q=80",
     pickup_slots: ["03:00 PM - 06:00 PM", "06:00 PM - 09:00 PM"],
     description: "Exclusive seafront weekend market offering premium organic heirloom fruits, cultured cheeses, grass-fed meats, and natural cosmetic botanicals.",
-    facilities: ["ðŸ…¿ï¸ Valet & Promenade Parking", "ðŸŒŠ Sea Breeze Outdoor Seating", "â™¿ Fully Accessible", "ðŸ’³ All Digital Payments Supported"],
+    facilities: ["🅿️ Valet & Promenade Parking", "🌊 Sea Breeze Outdoor Seating", "♿ Fully Accessible", "💳 All Digital Payments Supported"],
     featured_produce: ["Pasture-Raised Eggs", "Stone-Ground Sesame Oil", "Organic Guavas", "Cultured Goat Butter"],
     map_provider: "Google Maps API",
     stall_layout_map: [
@@ -112,7 +112,7 @@ export const MARKETS = [
     image: "/hero_farmer_basket.jpg",
     pickup_slots: ["07:00 AM - 09:00 AM", "09:00 AM - 11:00 AM"],
     description: "Authentic farm-gate market located directly on the Malir farm grounds. Pick up crops harvested right off the soil just minutes before opening.",
-    facilities: ["ðŸšœ Farm Field Tours Available", "ðŸŒ¿ 100% Zero-Chemical Spray", "ðŸŒ¾ Direct Grower Pricing", "â˜• Fresh Farm Chai Corner"],
+    facilities: ["🚜 Farm Field Tours Available", "🌿 100% Zero-Chemical Spray", "🌾 Direct Grower Pricing", "☕ Fresh Farm Chai Corner"],
     featured_produce: ["Field-Cut Palak", "Sweet Purple Carrots", "Desi Free-Range Eggs", "Fresh Mint & Basil"],
     map_provider: "OpenStreetMap",
     stall_layout_map: [
@@ -139,7 +139,7 @@ export const MARKETS = [
     image: "https://images.unsplash.com/photo-1488459716781-31db52582fe9?auto=format&fit=crop&w=800&q=80",
     pickup_slots: ["05:00 PM - 07:30 PM", "07:30 PM - 10:00 PM"],
     description: "A bustling neighborhood bazaar bringing certified organic produce and fresh farm dairy closer to North Nazimabad households.",
-    facilities: ["ðŸ…¿ï¸ Community Center Parking", "ðŸ§’ Kids Organic Workshop Corner", "ðŸ’³ Cash & Mobile Pay Accepted"],
+    facilities: ["🅿️ Community Center Parking", "🧒 Kids Organic Workshop Corner", "💳 Cash & Mobile Pay Accepted"],
     featured_produce: ["Fresh Red Radishes", "Pure Mustard Oil", "Wildflower Honey", "Desi Paneer"],
     map_provider: "Google Maps API",
     stall_layout_map: [
@@ -166,93 +166,12 @@ export const MARKETS = [
     image: "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80",
     pickup_slots: ["09:00 AM - 11:30 AM", "11:30 AM - 02:00 PM"],
     description: "Artisanal food market featuring small-batch jams, raw pickles, heirloom citrus fruits, and pasture-raised meats.",
-    facilities: ["🅿️ Park Side Parking", "🍞 Live Sourdough Baking", "💳 Contactless NFC Payment"],
+    facilities: ["🅿️ Park Side Parking", "🥐 Live Sourdough Baking", "💳 Contactless NFC Payment"],
     featured_produce: ["Heirloom Citrus", "Raw Mango Preserves", "Cold-Pressed Oils", "Farm Butter"],
     map_provider: "OpenStreetMap",
     stall_layout_map: [
       "Stall #P-01: PECHS Growers Desk",
       "Stall #P-03: Indus Valley Citrus Stand"
-    ]
-  },
-  {
-    market_id: 7,
-    market_name: "Bahria Town Green Farmers Market",
-    region: "PECHS & Central",
-    address: "Main Carnival Square, Sector 1, Bahria Town, Karachi",
-    operating_days: ["Saturdays", "Sundays"],
-    operating_hours: "8:00 AM - 2:00 PM",
-    distance: "12.5 km away",
-    latitude: 24.9980,
-    longitude: 67.2900,
-    attending_farmers: 22,
-    rating: 4.9,
-    reviews_count: 168,
-    status: "OPEN THIS WEEKEND",
-    badge: "FRESH HARVEST HUB",
-    badge_color: "bg-emerald-700",
-    image: "https://images.unsplash.com/photo-1578916171728-46686eac8d58?auto=format&fit=crop&w=800&q=80",
-    pickup_slots: ["08:00 AM - 11:00 AM", "11:00 AM - 02:00 PM"],
-    description: "Expansive weekend community market featuring over 20 Malir and Thatta organic farmers offering fresh harvests, raw honey, and pastured dairy.",
-    facilities: ["🅿️ Dedicated Visitor Parking", "🌱 100% Organic Certified Stalls", "♿ Wheelchair Accessible", "💳 Contactless Card & App Pay", "🧃 Cold-Pressed Juice Counter"],
-    featured_produce: ["Organic Strawberries", "Raw Honey", "Desi Eggs", "Microgreens"],
-    map_provider: "Google Maps API",
-    stall_layout_map: [
-      "Stall #B-01: Bahria Organic Farm Desk",
-      "Stall #B-04: Malir Apiary Honey Stand"
-    ]
-  },
-  {
-    market_id: 8,
-    market_name: "Defence Sunset Organic Promenade",
-    region: "Clifton & South",
-    address: "Phase 6 Commercial Avenue, DHA Phase 6, Karachi",
-    operating_days: ["Wednesdays", "Fridays"],
-    operating_hours: "4:00 PM - 9:30 PM",
-    distance: "4.8 km away",
-    latitude: 24.7890,
-    longitude: 67.0650,
-    attending_farmers: 17,
-    rating: 4.8,
-    reviews_count: 129,
-    status: "MIDWEEK SUNSET",
-    badge: "ORGANIC PROMENADE",
-    badge_color: "bg-amber-600",
-    image: "https://images.unsplash.com/photo-1488459716781-31db52582fe9?auto=format&fit=crop&w=800&q=80",
-    pickup_slots: ["04:00 PM - 06:30 PM", "06:30 PM - 09:30 PM"],
-    description: "Chic evening bazaar featuring certified hydroponics, specialty goat milk cheeses, artisan stone-ground flours, and fresh herbs.",
-    facilities: ["🅿️ Valet & Street Parking", "🥐 Live Artisan Bakery", "💳 All Digital Payments", "🍃 Chemical-Free Produce"],
-    featured_produce: ["Specialty Goat Cheese", "Organic Kale", "Stone-Ground Flour", "Fresh Mint"],
-    map_provider: "Google Maps API",
-    stall_layout_map: [
-      "Stall #D-01: Defence Artisanal Desk",
-      "Stall #D-05: Gharo Organic Dairy"
-    ]
-  },
-  {
-    market_id: 9,
-    market_name: "Korangi Riverbed Produce Hub",
-    region: "Malir Agricultural",
-    address: "Korangi Creek Road, Near Agro Fields, Karachi",
-    operating_days: ["Thursdays", "Sundays"],
-    operating_hours: "7:00 AM - 12:00 PM",
-    distance: "7.1 km away",
-    latitude: 24.8250,
-    longitude: 67.1400,
-    attending_farmers: 15,
-    rating: 4.9,
-    reviews_count: 98,
-    status: "DIRECT FROM FIELDS",
-    badge: "RIVERBED BAZAAR",
-    badge_color: "bg-teal-700",
-    image: "/farmers_market_bazaar.jpg",
-    pickup_slots: ["07:00 AM - 09:30 AM", "09:30 AM - 12:00 PM"],
-    description: "Direct-from-field morning market serving fresh green leafy vegetables, seasonal root crops, and natural dairy directly from local growers.",
-    facilities: ["🚜 Direct Farm Field Stalls", "🌿 Zero Chemical Pesticides", "🏷️ Direct Grower Pricing", "☕ Fresh Chai Counter"],
-    featured_produce: ["Field Palak", "Fresh Coriander", "Desi Cow Ghee", "Organic Tomatoes"],
-    map_provider: "OpenStreetMap",
-    stall_layout_map: [
-      "Stall #K-01: Riverbed Growers Collective",
-      "Stall #K-03: Korangi Dairy Farmers"
     ]
   }
 ];
@@ -310,11 +229,71 @@ export const FARMERS = [
     market_id: 4,
     market_name: "Malir Organic Farm Market"
   },
-  { farmer_id: 105, farmer_name: "Zainab Khurshid", farm_name: "Sunrise Spice Gardens, Hyderabad", stall_name: "Sunrise Spice Gardens", rating: 4.9, orders_count: 76, tags: ["Organic Spices", "Sun-Dried Herbs"], bio: "Sun-dried chilies and turmeric from heritage seed gardens in Hyderabad.", image: "https://images.unsplash.com/photo-1607990281513-2c110a25bd8c?auto=format&fit=crop&w=600&q=80", market_id: 1, market_name: "Clifton Sunday Market" },
-  { farmer_id: 106, farmer_name: "Hamza Nawaz", farm_name: "Thatta Riverside Farms", stall_name: "Thatta Fresh Greens", rating: 4.6, orders_count: 143, tags: ["Leafy Greens", "River Soil Grown"], bio: "Crisp lettuce and fenugreek grown in mineral-rich Indus delta soil.", image: "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=600&q=80", market_id: 2, market_name: "Gulshan Green Bazaar" },
-  { farmer_id: 107, farmer_name: "Rukhsana Bibi", farm_name: "Lasbela Heritage Groves", stall_name: "Lasbela Date Stall", rating: 4.8, orders_count: 67, tags: ["Dates", "Dried Fruits"], bio: "Premium Aseel dates and wild figs from ancient Balochistan groves.", image: "https://images.unsplash.com/photo-1554080353-a576cf803bda?auto=format&fit=crop&w=600&q=80", market_id: 3, market_name: "DHA Farmers Circle" },
-  { farmer_id: 108, farmer_name: "Imran Baloch", farm_name: "Khuzdar Mountain Farms", stall_name: "Mountain Fresh Produce", rating: 4.7, orders_count: 89, tags: ["Pomegranate", "Stone Fruits"], bio: "Ruby-red pomegranates and wild almonds from Khuzdar mountain valleys.", image: "https://images.unsplash.com/photo-1564760055775-d63b17a55c44?auto=format&fit=crop&w=600&q=80", market_id: 4, market_name: "Malir Organic Farm Market" },
-  { farmer_id: 109, farmer_name: "Nadia Aslam", farm_name: "Korangi Urban Hydroponics", stall_name: "Urban Roots Hydro", rating: 4.9, orders_count: 55, tags: ["Hydroponics", "Microgreens"], bio: "Year-round microgreens and edible flowers grown via clean hydroponic systems.", image: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?auto=format&fit=crop&w=600&q=80", market_id: 1, market_name: "Clifton Sunday Market" }
+  {
+    farmer_id: 105,
+    farmer_name: "Zainab Khurshid",
+    farm_name: "Sunrise Spice Gardens, Hyderabad",
+    stall_name: "Sunrise Spice Gardens",
+    rating: 4.9,
+    orders_count: 76,
+    tags: ["Organic Spices", "Sun-Dried Herbs"],
+    bio: "Sun-dried chilies, turmeric roots, and hand-ground masala blends sourced from heritage seed gardens in Hyderabad.",
+    image: "https://images.unsplash.com/photo-1607990281513-2c110a25bd8c?auto=format&fit=crop&w=600&q=80",
+    market_id: 1,
+    market_name: "Clifton Sunday Market"
+  },
+  {
+    farmer_id: 106,
+    farmer_name: "Hamza Nawaz",
+    farm_name: "Thatta Riverside Farms",
+    stall_name: "Thatta Fresh Greens",
+    rating: 4.6,
+    orders_count: 143,
+    tags: ["Leafy Greens", "River Soil Grown"],
+    bio: "Crisp lettuce, fenugreek, and water spinach cultivated in mineral-rich Indus delta soil with zero pesticides.",
+    image: "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=600&q=80",
+    market_id: 2,
+    market_name: "Gulshan Green Bazaar"
+  },
+  {
+    farmer_id: 107,
+    farmer_name: "Rukhsana Bibi",
+    farm_name: "Lasbela Heritage Groves",
+    stall_name: "Lasbela Date & Fruit",
+    rating: 4.8,
+    orders_count: 67,
+    tags: ["Dates & Figs", "Dried Fruits"],
+    bio: "Premium Aseel and Fasli dates, wild figs, and sun-dried apricots from ancient groves along the Balochistan coast.",
+    image: "https://images.unsplash.com/photo-1554080353-a576cf803bda?auto=format&fit=crop&w=600&q=80",
+    market_id: 3,
+    market_name: "DHA Farmers Circle"
+  },
+  {
+    farmer_id: 108,
+    farmer_name: "Imran Baloch",
+    farm_name: "Khuzdar Mountain Farms",
+    stall_name: "Mountain Fresh Produce",
+    rating: 4.7,
+    orders_count: 89,
+    tags: ["Pomegranate", "Stone Fruits"],
+    bio: "Ruby-red pomegranates, wild almonds, and sour cherries grown at altitude in Khuzdar's cool mountain valleys.",
+    image: "https://images.unsplash.com/photo-1564760055775-d63b17a55c44?auto=format&fit=crop&w=600&q=80",
+    market_id: 4,
+    market_name: "Malir Organic Farm Market"
+  },
+  {
+    farmer_id: 109,
+    farmer_name: "Nadia Aslam",
+    farm_name: "Korangi Urban Hydroponics",
+    stall_name: "Urban Roots Hydro",
+    rating: 4.9,
+    orders_count: 55,
+    tags: ["Hydroponics", "Microgreens"],
+    bio: "Year-round microgreens, basil, cherry tomatoes, and edible flowers grown without soil using clean hydroponic systems.",
+    image: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?auto=format&fit=crop&w=600&q=80",
+    market_id: 1,
+    market_name: "Clifton Sunday Market"
+  }
 ];
 
 export const PRODUCTS = [
@@ -367,7 +346,7 @@ export const PRODUCTS = [
     is_organic: true,
     rating: 4.8,
     image: "https://images.unsplash.com/photo-1576045057995-568f588f82fb?auto=format&fit=crop&w=600&q=80",
-    description: "Freshly cut tender spinach harvested from Malir riverbed soil. Rich in iron and folate â€” cut same-morning."
+    description: "Freshly cut tender spinach harvested from Malir riverbed soil. Rich in iron and folate — cut same-morning."
   },
   {
     product_id: 211,
@@ -382,7 +361,7 @@ export const PRODUCTS = [
     stock_quantity: 20,
     is_organic: true,
     rating: 4.7,
-    image: "https://images.unsplash.com/photo-1546094096-0df4bcaaa337?auto=format&fit=crop&w=600&q=80",
+    image: "/images/product_tomatoes.jpg",
     description: "Mixed heirloom cherry and plum tomatoes in golden, red, and green. Intensely sweet, vine-ripened overnight before market."
   },
   {
@@ -414,8 +393,8 @@ export const PRODUCTS = [
     stock_quantity: 30,
     is_organic: true,
     rating: 4.5,
-    image: "https://images.unsplash.com/photo-1447175008436-054170c2e979?auto=format&fit=crop&w=600&q=80",
-    description: "Rare purple-skin sweet carrots grown in Malir riverbed alluvial soil. Rich in anthocyanins â€” naturally sweet, crunchy perfection."
+    image: "/images/product_carrots.jpg",
+    description: "Rare purple-skin sweet carrots grown in Malir riverbed alluvial soil. Rich in anthocyanins — naturally sweet, crunchy perfection."
   },
   {
     product_id: 214,
@@ -430,7 +409,7 @@ export const PRODUCTS = [
     stock_quantity: 14,
     is_organic: true,
     rating: 4.7,
-    image: "https://images.unsplash.com/photo-1510627489930-0c1b0bfb6785?auto=format&fit=crop&w=600&q=80",
+    image: "/images/product_kale.jpg",
     description: "Tender early-harvest baby kale leaves from non-GMO heirloom seeds. Picked at peak nutrition, perfect for salads and smoothies."
   },
   {
@@ -480,8 +459,8 @@ export const PRODUCTS = [
     stock_quantity: 15,
     is_organic: true,
     rating: 5.0,
-    image: "https://images.unsplash.com/photo-1519996529931-28324d5a630e?auto=format&fit=crop&w=600&q=80",
-    description: "Premium Sindhri variety mangoes from Tando Allah Yar. The king of fruits â€” buttery, fiber-free pulp with intoxicating floral sweetness."
+    image: "/images/product_mangoes.jpg",
+    description: "Premium Sindhri variety mangoes from Tando Allah Yar. The king of fruits — buttery, fiber-free pulp with intoxicating floral sweetness."
   },
   {
     product_id: 217,
@@ -497,7 +476,7 @@ export const PRODUCTS = [
     is_organic: false,
     rating: 4.6,
     image: "https://images.unsplash.com/photo-1526318896980-cf78c088247c?auto=format&fit=crop&w=600&q=80",
-    description: "Sun-ripened desi papayas picked at perfect ripeness. High in digestive enzymes â€” rich orange flesh, naturally sweet."
+    description: "Sun-ripened desi papayas picked at perfect ripeness. High in digestive enzymes — rich orange flesh, naturally sweet."
   },
   {
     product_id: 218,
@@ -513,7 +492,7 @@ export const PRODUCTS = [
     is_organic: true,
     rating: 4.8,
     image: "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?auto=format&fit=crop&w=600&q=80",
-    description: "Deep ruby pomegranates loaded with sweet-tart arils â€” freshly picked from drought-resilient trees in the Balochistan foothills."
+    description: "Deep ruby pomegranates loaded with sweet-tart arils — freshly picked from drought-resilient trees in the Balochistan foothills."
   },
 
   // === DAIRY ===
@@ -530,7 +509,7 @@ export const PRODUCTS = [
     stock_quantity: 30,
     is_organic: true,
     rating: 4.9,
-    image: "https://images.unsplash.com/photo-1527153857715-3908f2bae5e8?auto=format&fit=crop&w=600&q=80",
+    image: "/images/product_milk.jpg",
     description: "Raw unpasteurized grass-fed A2 milk delivered fresh on market morning from Gharo free-roaming herds. Naturally full-cream."
   },
   {
@@ -546,8 +525,8 @@ export const PRODUCTS = [
     stock_quantity: 9,
     is_organic: true,
     rating: 5.0,
-    image: "https://images.unsplash.com/photo-1551462147-37885acc36f1?auto=format&fit=crop&w=600&q=80",
-    description: "Traditional slow-churned grass-fed desi cow ghee prepared from cultured butter. Nutty, aromatic, medicinal â€” the gold standard of pure ghee."
+    image: "/images/product_ghee.jpg",
+    description: "Traditional slow-churned grass-fed desi cow ghee prepared from cultured butter. Nutty, aromatic, medicinal — the gold standard of pure ghee."
   },
   {
     product_id: 220,
@@ -563,7 +542,7 @@ export const PRODUCTS = [
     is_organic: true,
     rating: 4.8,
     image: "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?auto=format&fit=crop&w=600&q=80",
-    description: "Fresh farm paneer made with pure A2 desi cow milk and natural lemon curd. Soft, moist, and crumble-free â€” made same-morning."
+    description: "Fresh farm paneer made with pure A2 desi cow milk and natural lemon curd. Soft, moist, and crumble-free — made same-morning."
   },
 
   // === HERBS ===
@@ -581,7 +560,7 @@ export const PRODUCTS = [
     is_organic: true,
     rating: 4.7,
     image: "https://images.unsplash.com/photo-1618375569909-3c8616cf7733?auto=format&fit=crop&w=600&q=80",
-    description: "Aromatic Genoese and Desi basil freshly cut from herb beds. Packed with essential oils â€” perfect for pesto, biryani garnish, or chai."
+    description: "Aromatic Genoese and Desi basil freshly cut from herb beds. Packed with essential oils — perfect for pesto, biryani garnish, or chai."
   },
   {
     product_id: 222,
@@ -631,7 +610,7 @@ export const REVIEWS = [
     review_id: 2,
     customer_name: "Bilal Sheikh",
     rating: 5,
-    comment: "The A2 Desi cow milk from Tariq Mahmood is fresh and pure. Picked up right at Stall B-04 with my digital ticket â€” so smooth!",
+    comment: "The A2 Desi cow milk from Tariq Mahmood is fresh and pure. Picked up right at Stall B-04 with my digital ticket — so smooth!",
     date: "3 days ago",
     farmer_name: "Tariq Mahmood (Gharo Dairy)",
     verified: true
@@ -640,7 +619,7 @@ export const REVIEWS = [
     review_id: 3,
     customer_name: "Sana Mir",
     rating: 5,
-    comment: "The Sindhri mangoes from Indus Valley Orchards were absolutely divine â€” buttery sweet, zero fiber. Worth every rupee!",
+    comment: "The Sindhri mangoes from Indus Valley Orchards were absolutely divine — buttery sweet, zero fiber. Worth every rupee!",
     date: "5 days ago",
     farmer_name: "Dr. Bilal Soomro (Indus Valley Orchards)",
     verified: true
@@ -649,7 +628,7 @@ export const REVIEWS = [
     review_id: 4,
     customer_name: "Hamza Raza",
     rating: 4,
-    comment: "Love the DHA Friday market concept â€” great variety of produce and the facilities are top-notch. Will definitely pre-order again next week.",
+    comment: "Love the DHA Friday market concept — great variety of produce and the facilities are top-notch. Will definitely pre-order again next week.",
     date: "1 week ago",
     farmer_name: "Multiple Farmers (DHA Circle)",
     verified: false
@@ -658,7 +637,7 @@ export const REVIEWS = [
     review_id: 5,
     customer_name: "Nadia Ahmed",
     rating: 5,
-    comment: "The cultured Desi Ghee is restaurant-quality at farm prices. Chaudhry Riaz's herbs are so fragrant â€” the basil transformed my pasta!",
+    comment: "The cultured Desi Ghee is restaurant-quality at farm prices. Chaudhry Riaz's herbs are so fragrant — the basil transformed my pasta!",
     date: "1 week ago",
     farmer_name: "Chaudhry Riaz (Green Acres Bio-Farms)",
     verified: true

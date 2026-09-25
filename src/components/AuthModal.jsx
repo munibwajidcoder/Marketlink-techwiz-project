@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { loginUser, registerUser } from '../services/api';
 import { 
   X, 
   Mail, 
@@ -83,85 +84,74 @@ export default function AuthModal({
     if (errorMsg) setErrorMsg('');
   };
 
-  const handleSignInSubmit = (e) => {
+  const handleSignInSubmit = async (e) => {
     e.preventDefault();
     if (!formData.email || !formData.password) {
-      setErrorMsg("Please enter both email/phone and password.");
+      setErrorMsg("Please enter both email and password.");
       return;
     }
-
     setIsLoading(true);
     setErrorMsg('');
-
-    setTimeout(() => {
-      setIsLoading(false);
-      // Determine user details based on accountType, initialAccountType, or email
-      const isFarmer = accountType === 'farmer' || initialAccountType === 'farmer' || formData.email.toLowerCase().includes('farmer') || formData.email.toLowerCase().includes('riaz') || formData.email.toLowerCase().includes('farm') || formData.email.toLowerCase().includes('grower');
+    try {
+      const { data } = await loginUser({ email: formData.email, password: formData.password });
+      // Save JWT token
+      localStorage.setItem('marketlink_token', data.token);
       const userObj = {
-        id: isFarmer ? 'usr_farmer_01' : 'usr_ayesha_01',
-        name: isFarmer ? (formData.email.split('@')[0] || 'Chaudhry Riaz') : 'Ayesha Khan',
-        shortName: isFarmer ? (formData.email.split('@')[0] || 'Riaz') : 'Ayesha',
-        email: formData.email,
-        phone: formData.phone || '+92 300 9876543',
-        role: isFarmer ? 'Farmer' : 'Customer',
-        locality: isFarmer ? 'Malir Agricultural Zone' : 'Clifton Block 4, Karachi',
-        stallName: isFarmer ? `${formData.email.split('@')[0]}'s Farm Stall` : undefined,
-        avatar: isFarmer ? 'R' : 'A',
-        avatarBg: isFarmer ? 'bg-amber-600' : 'bg-emerald-600',
-        memberSince: 'March 2025',
+        id: data._id,
+        name: data.name,
+        shortName: data.name.split(' ')[0],
+        email: data.email,
+        role: data.role,
+        avatar: data.name.charAt(0).toUpperCase(),
+        avatarBg: data.role === 'Farmer' ? 'bg-amber-600' : 'bg-emerald-600',
         isVerified: true
       };
-
       onLoginSuccess(userObj);
       showToast && showToast(`Welcome back, ${userObj.name}! Successfully signed in.`);
       onClose();
-    }, 700);
+    } catch (error) {
+      setErrorMsg(error.response?.data?.message || 'Login failed. Please check your credentials.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleRegisterSubmit = (e) => {
+  const handleRegisterSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.name.trim()) {
-      setErrorMsg("Please enter your full name.");
-      return;
-    }
-    if (!formData.email.trim() || !formData.email.includes('@')) {
-      setErrorMsg("Please enter a valid email address.");
-      return;
-    }
-    if (!formData.password || formData.password.length < 6) {
-      setErrorMsg("Password must be at least 6 characters.");
-      return;
-    }
-    if (formData.password !== formData.confirmPassword) {
-      setErrorMsg("Passwords do not match.");
-      return;
-    }
-    if (!formData.agreeTerms) {
-      setErrorMsg("Please agree to the MarketLink Terms & Organic Policy.");
-      return;
-    }
+    if (!formData.name.trim()) { setErrorMsg("Please enter your full name."); return; }
+    if (!formData.email.trim() || !formData.email.includes('@')) { setErrorMsg("Please enter a valid email address."); return; }
+    if (!formData.password || formData.password.length < 6) { setErrorMsg("Password must be at least 6 characters."); return; }
+    if (formData.password !== formData.confirmPassword) { setErrorMsg("Passwords do not match."); return; }
+    if (!formData.agreeTerms) { setErrorMsg("Please agree to the MarketLink Terms & Organic Policy."); return; }
 
     setIsLoading(true);
     setErrorMsg('');
-
-    setTimeout(() => {
-      setIsLoading(false);
-      const isFarmer = accountType === 'farmer' || initialAccountType === 'farmer' || Boolean(formData.stallName?.trim());
-      const userObj = {
-        id: `usr_${Date.now()}`,
+    const isFarmer = accountType === 'farmer';
+    try {
+      const { data } = await registerUser({
         name: formData.name,
-        shortName: formData.name.split(' ')[0] || formData.name,
         email: formData.email,
-        phone: formData.phone || '+92 300 1234567',
+        phone: formData.phone,
+        password: formData.password,
         role: isFarmer ? 'Farmer' : 'Customer',
-        locality: isFarmer ? (formData.farmRegion || 'Malir Agricultural Zone') : formData.locality,
-        stallName: isFarmer ? (formData.stallName || `${formData.name}'s Farm Stall`) : undefined,
-        avatar: formData.name.charAt(0).toUpperCase(),
+        stallName: formData.stallName,
+        farmRegion: formData.farmRegion,
+        cnic: formData.cnic
+      });
+      // Save JWT token
+      localStorage.setItem('marketlink_token', data.token);
+      const userObj = {
+        id: data._id,
+        name: data.name,
+        shortName: data.name.split(' ')[0],
+        email: data.email,
+        role: data.role,
+        stallName: formData.stallName || undefined,
+        avatar: data.name.charAt(0).toUpperCase(),
         avatarBg: isFarmer ? 'bg-amber-600' : 'bg-emerald-600',
         memberSince: 'Today',
         isVerified: true
       };
-
       onLoginSuccess(userObj);
       if (isFarmer) {
         showToast && showToast(`Welcome Grower ${userObj.name}! Redirecting to your Farmer Portal...`);
@@ -169,7 +159,11 @@ export default function AuthModal({
         showToast && showToast(`Welcome to MarketLink, ${userObj.name}! Your account is ready.`);
       }
       onClose();
-    }, 800);
+    } catch (error) {
+      setErrorMsg(error.response?.data?.message || 'Registration failed. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Quick 1-click Demo Logins for smooth evaluation
@@ -313,7 +307,7 @@ export default function AuthModal({
         </div>
 
         {/* Modal Scrollable Body */}
-        <div className="p-6 overflow-y-auto space-y-5 text-xs text-slate-700">
+        <div className="p-6 overflow-y-auto [&::-webkit-scrollbar]:hidden space-y-5 text-xs text-slate-700">
           
           {/* Error Banner */}
           {errorMsg && (

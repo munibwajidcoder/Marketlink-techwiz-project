@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { getProducts, replyToReview , createProduct, updateProduct, deleteProduct, getOrders, updateOrderStatus as apiUpdateOrderStatus } from '../services/api';
 import {
   Store, Package, ShoppingBag, TrendingUp, Star, Calendar, Clock,
   Plus, Edit2, Trash2, CheckCircle2, AlertCircle, RefreshCw, MapPin,
@@ -185,13 +186,53 @@ export default function FarmerDashboard({
 }) {
   const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'products' | 'template' | 'orders' | 'history' | 'reviews' | 'profile'
   
-  // Data states
-  const [products, setProducts] = useState(INITIAL_FARMER_PRODUCTS);
-  const [orders, setOrders] = useState(INITIAL_ORDERS);
-  const [reviews, setReviews] = useState(INITIAL_REVIEWS);
+  // Data states — start empty, load from real API
+  const [products, setProducts] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const [reviews, setReviews] = useState([]);
+  const [loadingProducts, setLoadingProducts] = useState(true);
+  const [loadingOrders, setLoadingOrders] = useState(true);
   const [cutoffActive, setCutoffActive] = useState(true);
   const [cutoffTime, setCutoffTime] = useState('Saturday 8:00 PM');
   const [farmerSearchQuery, setFarmerSearchQuery] = useState('');
+
+  // Fetch Products from real backend on mount
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const { data } = await getProducts();
+        // Filter only this farmer's products if farmer_id matches
+        const myProducts = currentUser?._id
+          ? data.filter(p => p.farmer_id === currentUser._id || p.farmer_id?._id === currentUser._id || p.farmer_id === currentUser.id)
+          : data;
+        setProducts(myProducts.length > 0 ? myProducts : data);
+      } catch (err) {
+        console.error('Failed to load products:', err);
+      } finally {
+        setLoadingProducts(false);
+      }
+    };
+    fetchProducts();
+  }, [currentUser]);
+
+  // Fetch Orders from real backend on mount
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const { data } = await getOrders();
+        // Filter orders for this farmer
+        const myOrders = currentUser?._id
+          ? data.filter(o => o.farmer_id === currentUser._id || o.farmer_id?._id === currentUser._id || o.farmer_id === currentUser.id)
+          : data;
+        setOrders(myOrders);
+      } catch (err) {
+        console.error('Failed to load orders:', err);
+      } finally {
+        setLoadingOrders(false);
+      }
+    };
+    fetchOrders();
+  }, [currentUser]);
   
   // Product Modal (Add/Edit)
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
@@ -282,49 +323,45 @@ export default function FarmerDashboard({
     setIsProductModalOpen(true);
   };
 
-  const handleSaveProduct = (e) => {
+  const handleSaveProduct = async (e) => {
     e.preventDefault();
     if (!prodForm.name || !prodForm.price || !prodForm.stock_quantity) {
       showToast && showToast('Please fill in product name, price, and stock quantity.');
       return;
     }
-
-    if (editingProduct) {
-      setProducts(prev => prev.map(p =>
-        p.product_id === editingProduct.product_id
-          ? {
-              ...p,
-              name: prodForm.name,
-              category: prodForm.category,
-              price: parseFloat(prodForm.price),
-              unit: prodForm.unit,
-              stock_quantity: parseInt(prodForm.stock_quantity, 10),
-              weekly_template_qty: parseInt(prodForm.weekly_template_qty || prodForm.stock_quantity, 10),
-              is_organic: prodForm.is_organic,
-              is_sold_out: parseInt(prodForm.stock_quantity, 10) <= 0,
-              description: prodForm.description,
-              image: prodForm.image
-            }
-          : p
-      ));
-      showToast && showToast(`Updated "${prodForm.name}" successfully!`);
-    } else {
-      const newProd = {
-        product_id: `prod_${Date.now()}`,
-        name: prodForm.name,
-        category: prodForm.category,
-        price: parseFloat(prodForm.price),
-        unit: prodForm.unit,
-        stock_quantity: parseInt(prodForm.stock_quantity, 10),
-        weekly_template_qty: parseInt(prodForm.weekly_template_qty || prodForm.stock_quantity, 10),
-        is_organic: prodForm.is_organic,
-        is_sold_out: parseInt(prodForm.stock_quantity, 10) <= 0,
-        rating: 5.0,
-        description: prodForm.description,
-        image: prodForm.image
-      };
-      setProducts(prev => [newProd, ...prev]);
-      showToast && showToast(`Added "${prodForm.name}" to your farm catalog!`);
+    try {
+      if (editingProduct) {
+        const { data } = await updateProduct(editingProduct._id || editingProduct.product_id, {
+          name: prodForm.name,
+          category: prodForm.category,
+          price: parseFloat(prodForm.price),
+          unit: prodForm.unit,
+          stock_quantity: parseInt(prodForm.stock_quantity, 10),
+          isAvailable: parseInt(prodForm.stock_quantity, 10) > 0,
+          description: prodForm.description,
+          imageUrl: prodForm.image
+        });
+        setProducts(prev => prev.map(p =>
+          (p._id || p.product_id) === (editingProduct._id || editingProduct.product_id) ? data : p
+        ));
+        showToast && showToast(`Updated "${prodForm.name}" successfully!`);
+      } else {
+        const { data } = await createProduct({
+          farmer_id: currentUser?.id || currentUser?._id,
+          name: prodForm.name,
+          category: prodForm.category,
+          price: parseFloat(prodForm.price),
+          unit: prodForm.unit,
+          stock_quantity: parseInt(prodForm.stock_quantity, 10),
+          isAvailable: true,
+          description: prodForm.description,
+          imageUrl: prodForm.image
+        });
+        setProducts(prev => [data, ...prev]);
+        showToast && showToast(`Added "${prodForm.name}" to your farm catalog!`);
+      }
+    } catch (err) {
+      showToast && showToast('Failed to save product. Please try again.');
     }
     setIsProductModalOpen(false);
   };
@@ -344,10 +381,15 @@ export default function FarmerDashboard({
     }));
   };
 
-  const handleDeleteProduct = (id, name) => {
+  const handleDeleteProduct = async (id, name) => {
     if (window.confirm(`Are you sure you want to remove "${name}" from your listing?`)) {
-      setProducts(prev => prev.filter(p => p.product_id !== id));
-      showToast && showToast(`Removed "${name}" from catalog.`);
+      try {
+        await deleteProduct(id);
+        setProducts(prev => prev.filter(p => (p._id || p.product_id) !== id));
+        showToast && showToast(`Removed "${name}" from catalog.`);
+      } catch (err) {
+        showToast && showToast('Failed to delete product.');
+      }
     }
   };
 
@@ -360,23 +402,37 @@ export default function FarmerDashboard({
     showToast && showToast('Weekly stock template applied! Live inventory refreshed for market day.');
   };
 
-  const handleUpdateOrderStatus = (orderId, newStatus) => {
-    setOrders(prev => prev.map(o => {
-      if (o.orderId === orderId) {
-        return { ...o, status: newStatus };
-      }
-      return o;
-    }));
-    const statusLabels = {
-      accepted: 'Accepted! Customer notified.',
-      ready: 'Marked Ready for Pickup! QR pass verified.',
-      completed: 'Order completed & payment collected at stall.',
-      cancelled: 'Order cancelled.'
-    };
-    showToast && showToast(`Order #${orderId}: ${statusLabels[newStatus] || newStatus}`);
+  const handleUpdateOrderStatus = async (orderId, newStatus) => {
+    try {
+      await apiUpdateOrderStatus(orderId, newStatus);
+      setOrders(prev => prev.map(o =>
+        (o._id || o.orderId) === orderId ? { ...o, order_status: newStatus, status: newStatus } : o
+      ));
+      const statusLabels = {
+        accepted: 'Accepted! Customer notified.',
+        ready: 'Marked Ready for Pickup!',
+        completed: 'Order completed & payment collected.',
+        cancelled: 'Order cancelled.'
+      };
+      showToast && showToast(`Order: ${statusLabels[newStatus] || newStatus}`);
+    } catch (err) {
+      showToast && showToast('Failed to update order status.');
+    }
   };
 
-  const handleSubmitReviewReply = (revId) => {
+  const handleSubmitReviewReply = async (revId) => {
+    if (!replyText.trim()) return;
+    try {
+      await replyToReview(revId, replyText.trim());
+      setReviews(prev => prev.map(r => r._id === revId || r.id === revId ? { ...r, farmerReply: replyText.trim() } : r));
+      setReplyingRevId(null);
+      setReplyText('');
+      showToast && showToast('Farmer reply published to review!');
+    } catch(err) {
+      showToast && showToast('Failed to post reply.');
+    }
+  };
+  const oldHandleSubmitReviewReply = (revId) => {
     if (!replyText.trim()) return;
     setReviews(prev => prev.map(r =>
       r.id === revId ? { ...r, farmerReply: replyText.trim() } : r

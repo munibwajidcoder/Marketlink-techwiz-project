@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { getOrders, updateOrderStatus as apiUpdateOrderStatus } from '../services/api';
 import {
   X, ShoppingBag, Clock, CheckCircle2, AlertCircle, Star,
   QrCode, MapPin, RotateCcw, XCircle, ChevronRight, Leaf,
@@ -67,23 +68,63 @@ const STATUS_STYLES = {
 
 export default function CustomerDashboard({ isOpen, onClose, currentUser, onReorder, showToast, onNavigate }) {
   const [activeTab, setActiveTab] = useState('orders'); // 'orders' | 'history' | 'favorites'
-  const [orders, setOrders] = useState(DEMO_ORDERS);
+  const [orders, setOrders] = useState([]);
   const [cancellingId, setCancellingId] = useState(null);
+  const [loadingOrders, setLoadingOrders] = useState(true);
+
+  useEffect(() => {
+    if (isOpen) {
+      getOrders()
+        .then(({ data }) => {
+          // Filter only this customer's orders if currentUser exists, else show all (or handle accordingly)
+          const myOrders = currentUser?._id
+            ? data.filter(o => o.customer_id === currentUser._id || o.customer_id?._id === currentUser._id || o.customer_id === currentUser.id)
+            : data;
+          
+          // Map to match frontend structure
+          const mapped = myOrders.map(o => ({
+            orderId: o._id || o.orderId,
+            status: o.order_status === 'placed' ? 'Placed' 
+                  : o.order_status === 'ready' ? 'Ready for Pickup'
+                  : o.order_status === 'completed' ? 'Completed'
+                  : o.order_status === 'cancelled' ? 'Cancelled'
+                  : 'Placed',
+            placedAt: o.order_date || new Date().toISOString(),
+            pickupSlot: o.pickup_time_slot || 'Sunday',
+            total: o.total_amount,
+            items: o.products ? o.products.map(p => ({
+              name: p.product_id?.name || 'Product',
+              qty: p.quantity,
+              price: p.price,
+              farmer: p.product_id?.farmer_id?.name || 'Farmer'
+            })) : []
+          }));
+          setOrders(mapped.length > 0 ? mapped : DEMO_ORDERS);
+        })
+        .catch(() => setOrders(DEMO_ORDERS))
+        .finally(() => setLoadingOrders(false));
+    }
+  }, [isOpen, currentUser]);
 
   if (!isOpen) return null;
 
   const activeOrders = orders.filter(o => o.status === 'Placed' || o.status === 'Ready for Pickup');
   const historyOrders = orders.filter(o => o.status === 'Completed' || o.status === 'Cancelled');
 
-  const handleCancel = (orderId) => {
+  const handleCancel = async (orderId) => {
     setCancellingId(orderId);
-    setTimeout(() => {
+    try {
+      // call real backend
+      await apiUpdateOrderStatus(orderId, 'cancelled');
       setOrders(prev => prev.map(o =>
         o.orderId === orderId ? { ...o, status: 'Cancelled' } : o
       ));
-      setCancellingId(null);
       showToast && showToast(`Order #${orderId} cancelled successfully.`);
-    }, 800);
+    } catch (err) {
+      showToast && showToast(`Failed to cancel order #${orderId}.`);
+    } finally {
+      setCancellingId(null);
+    }
   };
 
   const handleReorder = (order) => {

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { getProducts, getOrders, getMarkets, createMarket, getUsers, updateUserStatus, deleteReview } from '../services/api';
 import {
   ShieldCheck, Users, Store, Package, ShoppingBag, BarChart2,
   AlertTriangle, Settings, Plus, Edit2, Trash2, CheckCircle2,
@@ -216,12 +217,79 @@ export default function AdminDashboard({
     modalBg: isDark ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900 shadow-2xl',
   };
 
-  // Master Data States
+  // Master Data States — load from real API
   const [farmers, setFarmers] = useState(INITIAL_FARMERS);
   const [customers, setCustomers] = useState(INITIAL_CUSTOMERS);
   const [markets, setMarkets] = useState(INITIAL_MARKETS);
   const [moderationItems, setModerationItems] = useState(INITIAL_MODERATION_ITEMS);
   const [categories, setCategories] = useState(INITIAL_CATEGORIES);
+
+  // Real API data states
+  const [realProducts, setRealProducts] = useState([]);
+  const [realOrders, setRealOrders] = useState([]);
+  const [realMarkets, setRealMarkets] = useState([]);
+  const [loadingStats, setLoadingStats] = useState(true);
+
+  // Fetch real data from backend
+  useEffect(() => {
+    const fetchAllData = async () => {
+      try {
+        const [prodRes, ordRes, mktRes, usersRes] = await Promise.all([
+          getProducts(),
+          getOrders(),
+          getMarkets(),
+          getUsers()
+        ]);
+        setRealProducts(prodRes.data || []);
+        setRealOrders(ordRes.data || []);
+        if (mktRes.data && mktRes.data.length > 0) {
+          setRealMarkets(mktRes.data);
+        }
+        if (usersRes.data) {
+          const allUsers = usersRes.data;
+          
+          const mappedFarmers = allUsers.filter(u => u.role === 'Farmer' || u.role === 'farmer').map(f => ({
+            id: f._id,
+            stallName: f.stallName || 'Organic Stall',
+            farmerName: f.name,
+            email: f.email,
+            phone: f.phone,
+            marketAssigned: 'MarketLink Platform',
+            status: f.status || 'pending',
+            productsCount: 0,
+            totalSales: '$0.00',
+            joinedDate: f.createdAt ? f.createdAt.split('T')[0] : '2026-09-24'
+          }));
+          
+          const mappedCustomers = allUsers.filter(u => u.role === 'Customer' || u.role === 'customer').map(c => ({
+            id: c._id,
+            name: c.name,
+            email: c.email,
+            phone: c.phone,
+            locality: 'Karachi Area',
+            ordersCount: 0,
+            status: c.status || 'active',
+            joinedDate: c.createdAt ? c.createdAt.split('T')[0] : '2026-09-24'
+          }));
+
+          setFarmers(mappedFarmers);
+          setCustomers(mappedCustomers);
+        }
+      } catch (err) {
+        console.error('Admin: failed to load real data', err);
+      } finally {
+        setLoadingStats(false);
+      }
+    };
+    fetchAllData();
+  }, []);
+
+  // Computed real stats
+  const totalRealOrders = realOrders.length;
+  const totalRealRevenue = realOrders
+    .filter(o => o.order_status === 'completed')
+    .reduce((sum, o) => sum + (o.total_amount || 0), 0);
+  const totalRealProducts = realProducts.length;
   const [announcements, setAnnouncements] = useState([
     {
       id: 'ann_1',
@@ -274,14 +342,24 @@ export default function AdminDashboard({
   });
 
   // Farmer Approval Handlers (SRS Page 9)
-  const handleApproveFarmer = (id, name) => {
-    setFarmers(prev => prev.map(f => f.id === id ? { ...f, status: 'approved' } : f));
-    showToast && showToast(`Farmer "${name}" registration APPROVED! Can now list products.`);
+  const handleApproveFarmer = async (id, name) => {
+    try {
+      await updateUserStatus(id, 'approved');
+      setFarmers(prev => prev.map(f => f.id === id ? { ...f, status: 'approved' } : f));
+      showToast && showToast(`Farmer "${name}" registration APPROVED! Can now list products.`);
+    } catch (err) {
+      showToast && showToast('Failed to approve farmer.');
+    }
   };
 
-  const handleSuspendFarmer = (id, name) => {
-    setFarmers(prev => prev.map(f => f.id === id ? { ...f, status: 'suspended' } : f));
-    showToast && showToast(`Farmer "${name}" account SUSPENDED.`);
+  const handleSuspendFarmer = async (id, name) => {
+    try {
+      await updateUserStatus(id, 'suspended');
+      setFarmers(prev => prev.map(f => f.id === id ? { ...f, status: 'suspended' } : f));
+      showToast && showToast(`Farmer "${name}" account SUSPENDED.`);
+    } catch (err) {
+      showToast && showToast('Failed to suspend farmer.');
+    }
   };
 
   const handleDeleteFarmer = (id, name) => {
@@ -292,10 +370,15 @@ export default function AdminDashboard({
   };
 
   // Customer Management Handlers (SRS Page 9)
-  const handleToggleCustomerStatus = (id, currentStatus, name) => {
+  const handleToggleCustomerStatus = async (id, currentStatus, name) => {
     const nextStatus = currentStatus === 'active' ? 'suspended' : 'active';
-    setCustomers(prev => prev.map(c => c.id === id ? { ...c, status: nextStatus } : c));
-    showToast && showToast(`Customer account "${name}" is now ${nextStatus.toUpperCase()}.`);
+    try {
+      await updateUserStatus(id, nextStatus);
+      setCustomers(prev => prev.map(c => c.id === id ? { ...c, status: nextStatus } : c));
+      showToast && showToast(`Customer account "${name}" is now ${nextStatus.toUpperCase()}.`);
+    } catch (err) {
+      showToast && showToast('Failed to update customer status.');
+    }
   };
 
   const handleDeleteCustomer = (id, name) => {
@@ -349,9 +432,16 @@ export default function AdminDashboard({
   };
 
   // Content Moderation Handlers (SRS Page 9)
-  const handleRemoveModerationItem = (id, title) => {
-    setModerationItems(prev => prev.filter(i => i.id !== id));
-    showToast && showToast(`Inappropriate item "${title}" removed from platform.`);
+  const handleRemoveModerationItem = async (id, title, type) => {
+    try {
+      if (type === 'review') {
+        await deleteReview(id);
+      }
+      setModerationItems(prev => prev.filter(i => i.id !== id));
+      showToast && showToast(`Inappropriate item "${title}" removed from platform.`);
+    } catch(err) {
+      showToast && showToast('Failed to remove item');
+    }
   };
 
   const handleDismissModerationItem = (id) => {
@@ -771,7 +861,7 @@ export default function AdminDashboard({
                 <div className={`${t.cardBg} p-5 rounded-3xl border ${t.border} shadow-xs space-y-2`}>
                   <span className={`text-xs ${t.mutedText} font-semibold block`}>Total Active Customers</span>
                   <span className="text-2xl font-extrabold text-blue-500 font-heading block">
-                    1,450
+                    {customers.length}
                   </span>
                   <span className={`text-[10px] ${t.mutedText} font-medium`}>Across all zones</span>
                 </div>
@@ -787,17 +877,25 @@ export default function AdminDashboard({
                 <div className={`${t.cardBg} p-5 rounded-3xl border ${t.border} shadow-xs space-y-2`}>
                   <span className={`text-xs ${t.mutedText} font-semibold block`}>Platform Pre-Orders</span>
                   <span className="text-2xl font-extrabold text-emerald-500 font-heading block">
-                    3,840
+                    {loadingStats ? '...' : totalRealOrders}
                   </span>
-                  <span className="text-[10px] text-emerald-500 font-bold">98% fulfillment</span>
+                  <span className="text-[10px] text-emerald-500 font-bold">Live from MongoDB</span>
                 </div>
 
                 <div className={`${t.cardBg} p-5 rounded-3xl border ${t.border} shadow-xs space-y-2`}>
                   <span className={`text-xs ${t.mutedText} font-semibold block`}>Platform Gross Sales</span>
                   <span className="text-2xl font-extrabold text-cyan-500 font-heading block">
-                    $124,500
+                    {loadingStats ? '...' : `$${totalRealRevenue.toFixed(2)}`}
                   </span>
-                  <span className="text-[10px] text-cyan-500 font-mono">Paid at pickup</span>
+                  <span className="text-[10px] text-cyan-500 font-mono">Paid at pickup — Real data</span>
+                </div>
+
+                <div className={`${t.cardBg} p-5 rounded-3xl border ${t.border} shadow-xs space-y-2`}>
+                  <span className={`text-xs ${t.mutedText} font-semibold block`}>Total Products Listed</span>
+                  <span className="text-2xl font-extrabold text-rose-400 font-heading block">
+                    {loadingStats ? '...' : totalRealProducts}
+                  </span>
+                  <span className="text-[10px] text-rose-400 font-bold">Live from MongoDB</span>
                 </div>
               </div>
 
@@ -873,7 +971,7 @@ export default function AdminDashboard({
 
                         <div className="flex items-center gap-2">
                           <button
-                            onClick={() => handleRemoveModerationItem(item.id, item.title)}
+                            onClick={() => handleRemoveModerationItem(item.id, item.title, item.type)}
                             className="bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs px-3 py-1.5 rounded-xl transition cursor-pointer"
                           >
                             Remove
@@ -1160,7 +1258,7 @@ export default function AdminDashboard({
 
                     <div className="flex items-center gap-3">
                       <button
-                        onClick={() => handleRemoveModerationItem(item.id, item.title)}
+                        onClick={() => handleRemoveModerationItem(item.id, item.title, item.type)}
                         className="bg-rose-600 hover:bg-rose-500 text-white font-extrabold text-xs px-4 py-2 rounded-xl transition cursor-pointer"
                       >
                         Remove Listing / Review

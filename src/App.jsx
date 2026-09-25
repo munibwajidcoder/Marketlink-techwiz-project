@@ -28,6 +28,8 @@ import FarmerDashboard from './components/FarmerDashboard';
 import AdminLogin from './components/AdminLogin';
 import AdminDashboard from './components/AdminDashboard';
 
+import MarketMap from './components/MarketMap';
+import { getProducts } from './services/api';
 import { MARKETS, FARMERS, PRODUCTS, CATEGORIES, REVIEWS } from './data/mockData';
 import { Sparkles } from 'lucide-react';
 
@@ -37,6 +39,30 @@ export default function App() {
   const [selectedMarket, setSelectedMarket] = useState(MARKETS[0]);
   const [cart, setCart] = useState([]);
   const [favorites, setFavorites] = useState(['prod_201']);
+
+  // Real products from backend (merged with mock as fallback)
+  const [realProducts, setRealProducts] = useState([]);
+
+  useEffect(() => {
+    getProducts()
+      .then(({ data }) => {
+        if (data && data.length > 0) {
+          // Map backend product fields to frontend expected format
+          const mapped = data.map(p => ({
+            ...p,
+            product_id: p._id || p.product_id,
+            farmer_name: p.farmer_id?.name || 'MarketLink Farmer',
+            stall_name: p.farmer_id?.stallName || 'Organic Stall',
+            is_organic: true,
+            is_sold_out: !p.isAvailable || p.stock_quantity <= 0,
+            image: p.imageUrl || 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&q=80&w=600',
+            rating: 4.8
+          }));
+          setRealProducts(mapped);
+        }
+      })
+      .catch(() => setRealProducts([]));
+  }, []);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('all');
   const [reviewsList, setReviewsList] = useState(REVIEWS);
@@ -58,6 +84,7 @@ export default function App() {
   // User Auth & Profile State — starts as null (logged out)
   const [currentUser, setCurrentUser] = useState(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [hasSeenAuthModal, setHasSeenAuthModal] = useState(false);
   const [authModalMode, setAuthModalMode] = useState('signin'); // 'signin' | 'register'
   const [authModalAccountType, setAuthModalAccountType] = useState('customer'); // 'customer' | 'farmer'
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
@@ -90,6 +117,19 @@ export default function App() {
     };
   }, []);
 
+  // Tawk.to Live Chat Widget
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.async = true;
+    script.src = 'https://embed.tawk.to/64b2b6c794cf5d49dc6aa7d3/1h5e0sai8';
+    script.charset = 'UTF-8';
+    script.setAttribute('crossorigin', '*');
+    document.body.appendChild(script);
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
+
   // Automatic redirect for Farmer accounts on login or registration
   useEffect(() => {
     if (currentUser && (currentUser.role === 'Farmer' || currentUser.role === 'farmer')) {
@@ -99,19 +139,19 @@ export default function App() {
 
   // Auto-open AuthModal (Registration) if not logged in
   useEffect(() => {
-    // If they are not logged in, not on admin view, and the modal is currently closed
-    if (!currentUser && currentView !== 'admin' && !isAuthModalOpen) {
-      // Pop it open after a delay (e.g., 2 seconds) so it keeps bothering them until they log in
+    // Show only once if not logged in
+    if (!currentUser && currentView !== 'admin' && !isAuthModalOpen && !hasSeenAuthModal) {
       const timer = setTimeout(() => {
-        if (!currentUser && !isAuthModalOpen) {
+        if (!currentUser && !isAuthModalOpen && !hasSeenAuthModal) {
           setAuthModalMode('register');
           setAuthModalAccountType('customer');
           setIsAuthModalOpen(true);
+          setHasSeenAuthModal(true);
         }
       }, 5000); 
       return () => clearTimeout(timer);
     }
-  }, [currentUser, currentView, isAuthModalOpen]);
+  }, [currentUser, currentView, isAuthModalOpen, hasSeenAuthModal]);
 
   const handleNavigate = (view) => {
     if (view === 'admin') {
@@ -354,7 +394,7 @@ export default function App() {
 
             {/* 7. Integrated Category Browser & Product Catalog */}
             <ProductCatalog
-              products={PRODUCTS}
+              products={[...realProducts, ...PRODUCTS]}
               categories={CATEGORIES}
               activeCategory={activeCategory}
               onSelectCategory={setActiveCategory}
@@ -372,6 +412,9 @@ export default function App() {
               reviews={reviewsList}
               onOpenWriteReview={() => setIsReviewModalOpen(true)}
             />
+
+            {/* 9. Live Farmers Market Map (OpenStreetMap) */}
+            <MarketMap onNavigate={handleNavigate} />
           </div>
         )}
       </main>
@@ -394,7 +437,7 @@ export default function App() {
         onClose={() => setIsAiBotOpen(false)}
         markets={MARKETS}
         farmers={FARMERS}
-        products={PRODUCTS}
+        products={[...realProducts, ...PRODUCTS]}
       />
 
       <CartDrawer
@@ -413,7 +456,7 @@ export default function App() {
         <FarmerDetailModal
           farmer={selectedFarmerModal}
           onClose={() => setSelectedFarmerModal(null)}
-          products={PRODUCTS}
+          products={[...realProducts, ...PRODUCTS]}
           onAddToCart={handleAddToCart}
         />
       )}
